@@ -1,0 +1,31 @@
+#######################################
+# Syntax Coloring Map For DFRobot Gravity TDS Sensor
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+GravityTDSAnalog	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+update	KEYWORD2
+setVoltage KEYWORD2
+setTemperature	KEYWORD2
+setKvalueAddress	KEYWORD2
+getKvalue	KEYWORD2
+getTdsValue	KEYWORD2
+getEcValue	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
