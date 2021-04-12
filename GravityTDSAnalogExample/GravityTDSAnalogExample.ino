@@ -32,11 +32,15 @@
  #include <EEPROM.h>
  #include "GravityTDSAnalog.h"
 
+ #define EEPROM_SIZE 512
+
  GravityTDSAnalog gravityTdsAnalog;
  float temperature = 25, tdsValue = 0, voltage = 0;
 
+
  void setup(){
    Serial.begin(115200);
+   EEPROM.begin(EEPROM_SIZE);  //Initialize EEPROM
    gravityTdsAnalog.begin();  //initialization
  }
 
