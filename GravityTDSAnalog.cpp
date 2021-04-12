@@ -61,24 +61,31 @@ void GravityTDSAnalog::update(){
   this->ecValue=(133.42*this->voltage*this->voltage*this->voltage - 255.86*this->voltage*this->voltage + 857.39*this->voltage)*this->kValue;
   this->ecValue25  =  this->ecValue / (1.0+0.02*(this->temperature-25.0));  //temperature compensation
   this->tdsValue = ecValue25 * TdsFactor;
-  if(cmdSerialDataAvailable() > 0){
-        ecCalibration(cmdParse());  // if received serial cmd from the serial monitor, enter into the calibration mode
-    }
+  if(cmdSerialDataAvailable() > 0)
+        {
+            ecCalibration(cmdParse());  // if received serial cmd from the serial monitor, enter into the calibration mode
+        }
 }
 
-float GravityTDSAnalog::getTdsValue(){
-  return tdsValue;
+float GravityTDSAnalog::getTdsValue()
+{
+	return tdsValue;
 }
 
-float GravityTDSAnalog::getEcValue(){
-  return ecValue25;
+float GravityTDSAnalog::getEcValue()
+{
+      return ecValue25;
 }
 
-void GravityTDSAnalog::readKValues(){
+
+void GravityTDSAnalog::readKValues()
+{
     EEPROM_read(this->kValueAddress, this->kValue);
-    if(EEPROM.read(this->kValueAddress)==0xFF && EEPROM.read(this->kValueAddress+1)==0xFF && EEPROM.read(this->kValueAddress+2)==0xFF && EEPROM.read(this->kValueAddress+3)==0xFF){
-        this->kValue = 1.0;   // default value: K = 1.0
-        EEPROM_write(this->kValueAddress, this->kValue);
+    if(EEPROM.read(this->kValueAddress)==0xFF && EEPROM.read(this->kValueAddress+1)==0xFF && EEPROM.read(this->kValueAddress+2)==0xFF && EEPROM.read(this->kValueAddress+3)==0xFF)
+    {
+      this->kValue = 1.0;   // default value: K = 1.0
+      EEPROM_write(this->kValueAddress, this->kValue);
+
     }
 }
 
@@ -88,9 +95,10 @@ boolean GravityTDSAnalog::cmdSerialDataAvailable()
   static unsigned long cmdReceivedTimeOut = millis();
   while (Serial.available()>0)
   {
-    if(millis() - cmdReceivedTimeOut > 500U){
-        cmdReceivedBufferIndex = 0;
-        memset(cmdReceivedBuffer,0,(ReceivedBufferLength+1));
+    if (millis() - cmdReceivedTimeOut > 500U)
+    {
+      cmdReceivedBufferIndex = 0;
+      memset(cmdReceivedBuffer,0,(ReceivedBufferLength+1));
     }
     cmdReceivedTimeOut = millis();
     cmdReceivedChar = Serial.read();
@@ -98,8 +106,7 @@ boolean GravityTDSAnalog::cmdSerialDataAvailable()
 		cmdReceivedBufferIndex = 0;
 		strupr(cmdReceivedBuffer);
 		return true;
-    }
-    else{
+    }else{
       cmdReceivedBuffer[cmdReceivedBufferIndex] = cmdReceivedChar;
       cmdReceivedBufferIndex++;
     }
@@ -107,7 +114,8 @@ boolean GravityTDSAnalog::cmdSerialDataAvailable()
   return false;
 }
 
-byte GravityTDSAnalog::cmdParse(){
+byte GravityTDSAnalog::cmdParse()
+{
   byte modeIndex = 0;
   if(strstr(cmdReceivedBuffer, "ENTER") != NULL)
       modeIndex = 1;
@@ -118,12 +126,14 @@ byte GravityTDSAnalog::cmdParse(){
   return modeIndex;
 }
 
-void GravityTDSAnalog::ecCalibration(byte mode){
+void GravityTDSAnalog::ecCalibration(byte mode)
+{
     char *cmdReceivedBufferPtr;
     static boolean ecCalibrationFinish = 0;
     static boolean enterCalibrationFlag = 0;
     float KValueTemp,rawECsolution;
-    switch(mode){
+    switch(mode)
+    {
       case 0:
       if(enterCalibrationFlag)
          Serial.println(F("Command Error"));
@@ -143,13 +153,15 @@ void GravityTDSAnalog::ecCalibration(byte mode){
       cmdReceivedBufferPtr+=strlen("CAL:");
       rawECsolution = strtod(cmdReceivedBufferPtr,NULL)/(float)(TdsFactor);
       rawECsolution = rawECsolution*(1.0+0.02*(temperature-25.0));
-      if(enterCalibrationFlag){
+      if(enterCalibrationFlag)
+      {
          // Serial.print("rawECsolution:");
          // Serial.print(rawECsolution);
          // Serial.print("  ecvalue:");
          // Serial.println(ecValue);
           KValueTemp = rawECsolution/(133.42*voltage*voltage*voltage - 255.86*voltage*voltage + 857.39*voltage);  //calibrate in the  buffer solution, such as 707ppm(1413us/cm)@25^c
-          if((rawECsolution>0) && (rawECsolution<2000) && (KValueTemp>0.25) && (KValueTemp<4.0)){
+          if((rawECsolution>0) && (rawECsolution<2000) && (KValueTemp>0.25) && (KValueTemp<4.0))
+          {
               Serial.println();
               Serial.print(F(">>>Confrim Successful,K:"));
               Serial.print(KValueTemp);
@@ -167,10 +179,13 @@ void GravityTDSAnalog::ecCalibration(byte mode){
       break;
 
         case 3:
-        if(enterCalibrationFlag){
+        if(enterCalibrationFlag)
+        {
             Serial.println();
-            if(ecCalibrationFinish){
+            if(ecCalibrationFinish)
+            {
                EEPROM_write(kValueAddress, kValue);
+		EEPROM.commit();
                Serial.print(F(">>>Calibration Successful,K Value Saved"));
             }
             else Serial.print(F(">>>Calibration Failed"));
